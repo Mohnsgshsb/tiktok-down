@@ -586,57 +586,36 @@
         </footer>
     </div>
 
-    <script>
-document.getElementById('download-btn').addEventListener('click', fetchTikTok);
-document.getElementById('tiktok-url').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') fetchTikTok();
-});
+<script>
+document.getElementById('download-btn').addEventListener('click', async function () {
 
-async function fetchTikTok() {
     const url = document.getElementById('tiktok-url').value.trim();
-    if (!url) return alert('Please enter a TikTok URL');
-    
+    if (!url) return alert("حط لينك تيك توك");
+
+    const apiUrl = "https://emam-api.web.id/home/sections/Download/api/Tiktok/lovetik?url=" 
+    + encodeURIComponent(url);
+
     try {
-        document.getElementById('loading').style.display = 'block';
-        document.getElementById('result').style.display = 'none';
-        document.getElementById('download-btn').disabled = true;
-        document.getElementById('download-btn').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-        
-        const apiUrl = `https://emam-api.web.id/home/sections/Download/api/Tiktok/lovetik?url=${encodeURIComponent(url)}`;
         const response = await fetch(apiUrl);
         const data = await response.json();
-        
-        if (data.status && data.data) {
-            displayResult(data.data); // بيستخدم data.data
-        } else {
-            throw new Error('Failed to fetch TikTok data');
+
+        if (!data.status) {
+            alert("فشل تحميل البيانات");
+            return;
         }
-    } catch (error) {
-        console.error(error);
-        showError(error.message);
-    } finally {
-        document.getElementById('loading').style.display = 'none';
-        document.getElementById('download-btn').disabled = false;
-        document.getElementById('download-btn').innerHTML = '<i class="fas fa-cloud-download-alt"></i> Process Video';
+
+        const videoUrl = data.data; // ده لينك الفيديو المباشر
+
+        // تحميل مباشر
+        window.open(videoUrl, "_blank");
+
+    } catch (err) {
+        alert("حصل خطأ أثناء الاتصال بالـ API");
+        console.log(err);
     }
-}
 
-function displayResult(info) {
-    document.getElementById('video-title').textContent = info.title || 'Untitled';
-    document.getElementById('creator').textContent = info.author || 'Unknown Creator';
-    document.getElementById('caption').textContent = info.title || '';
-    document.getElementById('thumbnail').src = info.thumbnail || '';
-
-    document.getElementById('video-download').href = info.nowm;
-    document.getElementById('audio-download').href = info.audio;
-
-    document.getElementById('result').style.display = 'block';
-}
-
-function showError(message) {
-    alert('Error: ' + message);
-}
-    </script>
+});
+</script>
 
 
 
