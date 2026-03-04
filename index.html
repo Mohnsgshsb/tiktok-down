@@ -587,64 +587,55 @@
     </div>
 
     <script>
-        document.getElementById('download-btn').addEventListener('click', fetchTikTok);
-        document.getElementById('tiktok-url').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') fetchTikTok();
-        });
+document.getElementById('download-btn').addEventListener('click', fetchTikTok);
+document.getElementById('tiktok-url').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') fetchTikTok();
+});
 
-        async function fetchTikTok() {
-            const url = document.getElementById('tiktok-url').value.trim();
-            if (!url) return alert('Please enter a TikTok URL');
-            
-            try {
-                // Show loading state
-                document.getElementById('loading').style.display = 'block';
-                document.getElementById('result').style.display = 'none';
-                document.getElementById('download-btn').disabled = true;
-                document.getElementById('download-btn').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-                
-                const apiUrl = `https://emam-api.web.id/home/sections/Download/api/Tiktok/lovetik?url=${encodeURIComponent(url)}`;
-                const response = await fetch(apiUrl);
-                const data = await response.json();
-                
-                if (data.status) {
-                    displayResult(data);
-                } else {
-                    throw new Error(data.message || 'Failed to fetch TikTok data');
-                }
-            } catch (error) {
-                console.error(error);
-                showError(error.message);
-            } finally {
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('download-btn').disabled = false;
-                document.getElementById('download-btn').innerHTML = '<i class="fas fa-cloud-download-alt"></i> Process Video';
-            }
+async function fetchTikTok() {
+    const url = document.getElementById('tiktok-url').value.trim();
+    if (!url) return alert('Please enter a TikTok URL');
+    
+    try {
+        document.getElementById('loading').style.display = 'block';
+        document.getElementById('result').style.display = 'none';
+        document.getElementById('download-btn').disabled = true;
+        document.getElementById('download-btn').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+        
+        const apiUrl = `https://emam-api.web.id/home/sections/Download/api/Tiktok/lovetik?url=${encodeURIComponent(url)}`;
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+        
+        if (data.status && data.data) {
+            displayResult(data.data); // بيستخدم data.data
+        } else {
+            throw new Error('Failed to fetch TikTok data');
         }
+    } catch (error) {
+        console.error(error);
+        showError(error.message);
+    } finally {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('download-btn').disabled = false;
+        document.getElementById('download-btn').innerHTML = '<i class="fas fa-cloud-download-alt"></i> Process Video';
+    }
+}
 
-        function displayResult(data) {
-            const result = data.result;
-            
-            // Set video info
-            document.getElementById('video-title').textContent = result.title || 'Untitled';
-            document.getElementById('creator').textContent = data.creator || 'Unknown Creator';
-            document.getElementById('caption').textContent = result.caption || 'No caption available';
-            document.getElementById('thumbnail').src = result.thumbnail || 'placeholder.jpg';
-            
-            // Set download links
-            document.getElementById('video-download').href = result.nowm;
-            document.getElementById('audio-download').href = result.mp3;
-            
-            // Show result with animation
-            const resultElement = document.getElementById('result');
-            resultElement.style.display = 'block';
-            resultElement.style.animation = 'fadeInUp 0.5s forwards';
-        }
+function displayResult(info) {
+    document.getElementById('video-title').textContent = info.title || 'Untitled';
+    document.getElementById('creator').textContent = info.author || 'Unknown Creator';
+    document.getElementById('caption').textContent = info.title || '';
+    document.getElementById('thumbnail').src = info.thumbnail || '';
 
-        function showError(message) {
-            // You could implement a more elegant error display here
-            alert('Error: ' + message);
-        }
+    document.getElementById('video-download').href = info.nowm;
+    document.getElementById('audio-download').href = info.audio;
+
+    document.getElementById('result').style.display = 'block';
+}
+
+function showError(message) {
+    alert('Error: ' + message);
+}
     </script>
 
 
